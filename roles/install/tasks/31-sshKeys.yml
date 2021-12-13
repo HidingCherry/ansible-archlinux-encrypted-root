@@ -1,0 +1,16 @@
+---
+
+- name: get home-directory
+  shell: 'arch-chroot {{ part_infos.mountPath }} bash -c "grep {{ user_loop.name }} /etc/passwd | cut -d: -f6"'
+  register: user_home
+
+- name: sshKeys and permissions
+  shell: 'arch-chroot {{ part_infos.mountPath }} {{ item }}'
+  with_items:
+    - 'mkdir -p {{ user_home.stdout }}/.ssh/'
+    - 'bash -c ''echo "{{ user_loop.sshKeys }}" >> {{ user_home.stdout }}/.ssh/authorized_keys'''
+    - 'find {{ user_home.stdout }} -exec chown {{ user_loop.name }}: {} \;'
+    - 'find {{ user_home.stdout }} -type d -exec chmod 0750 {} \;'
+    - 'find {{ user_home.stdout }} -type f -exec chmod 0640 {} \;'
+
+...

@@ -28,4 +28,11 @@ install:
 
 localdomain: "lan"
 
+user:
+  - name: user999
+    useraddParams: "--groups wheel --create-home --shell /bin/bash --user-group"
+    sshKeys: |
+      ssh-ed25519 CHANGEME localuser@localhost
+    password: 'example'
+
 ...
