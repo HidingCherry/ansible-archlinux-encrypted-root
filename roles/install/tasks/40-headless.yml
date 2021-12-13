@@ -1,0 +1,86 @@
+---
+
+- name: remove /etc/issue content
+  copy:
+    dest: "{{ part_infos.mountPath }}/etc/issue"
+    content: ''
+
+- name: remove /etc/securetty content
+  copy:
+    dest: "{{ part_infos.mountPath }}/etc/securetty"
+    content: ''
+
+- name: remove fallback initrd in preset
+  replace:
+    backup: yes
+    path: "{{ part_infos.mountPath }}/etc/mkinitcpio.d/linux-hardened.preset"
+    regexp: '^(PRESETS=\()(''default'')( ''fallback'')?(.*\))$'
+    replace: '\g<1>\g<2>\g<4>'
+  notify: regenerate initramfs
+
+- name: delete fallback initrd
+  file:
+    path: "{{ part_infos.mountPath }}/boot/initramfs-linux-hardened-fallback.img"
+    state: absent
+  notify: regenerate grub.cfg
+
+- name: insert 'systemd systemd-tool' into mkinitcpio.conf
+  replace:
+    backup: yes
+    after: 'HOOKS='
+    before: '# COMPRESSION'
+    path: "{{ part_infos.mountPath }}/etc/mkinitcpio.conf"
+    regexp: '^(HOOKS=\([ \-a-z]*filesystems )(systemd systemd-tool)?([ \-a-z]*\))$'
+    replace: '\g<1>systemd systemd-tool \g<3>'
+  notify: regenerate initramfs
+
+- name: get root UUID
+  shell: blkid -o export /dev/{{ part_infos.device }}{{ part_infos.partitions[1].number }} |
+    grep -e "^UUID=" |
+    cut -d= -f 2
+  register: rootUUID
+
+- name: setup systemd-crypttab
+  lineinfile:
+    path: '{{ part_infos.mountPath }}/etc/mkinitcpio-systemd-tool/config/crypttab'
+    regexp: '^{{ part_infos.partitions[1].mapperLabel }} .*'
+    line: '{{ part_infos.partitions[1].mapperLabel }} UUID={{ rootUUID.stdout }} none luks,timeout=300'
+  notify: regenerate initramfs
+
+- name: get cryptroot UUID
+  shell: blkid -o export /dev/mapper/{{ part_infos.partitions[1].mapperLabel }} |
+    grep -e "^UUID=" |
+    cut -d= -f 2
+  register: cryptrootUUID
+
+- name: get cryptroot fstab entry
+  shell: cat {{ part_infos.mountPath }}/etc/fstab |
+    grep "UUID={{ cryptrootUUID.stdout }}" |
+    grep "/ "
+  register: cryptrootFstab
+
+- name: setup systemd-fstab (1/2)
+  lineinfile:
+    path: '{{ part_infos.mountPath }}/etc/mkinitcpio-systemd-tool/config/fstab'
+    regexp: '^UUID={{ cryptrootUUID.stdout }}.*'
+    line: '{{ cryptrootFstab.stdout }}'
+  notify: regenerate initramfs
+
+- name: setup systemd-fstab (2/2)
+  lineinfile:
+    path: '{{ part_infos.mountPath }}/etc/mkinitcpio-systemd-tool/config/fstab'
+    regexp: '^(UUID={{ cryptrootUUID.stdout }}.*)(x-systemd,x-systemd.device-timeout=\d+[a-z]+,)?(rw,.*)$'
+    line: '\g<1>x-systemd,x-systemd.device-timeout=5min,\g<2>'
+    backrefs: yes
+  notify: regenerate initramfs
+
+- name: enable initrd-stuff
+  shell:
+    arch-chroot {{ part_infos.mountPath }}
+    systemctl enable
+    initrd-cryptsetup.path
+    initrd-tinysshd.service
+    initrd-sysroot-mount.service
+  notify: regenerate initramfs
+
+...

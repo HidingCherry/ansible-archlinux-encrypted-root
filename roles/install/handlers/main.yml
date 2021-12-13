@@ -1,0 +1,8 @@
+---
+
+- name: run mkinitcpio
+  shell: arch-chroot {{ part_infos.mountPath }} mkinitcpio -P
+  listen: regenerate initramfs
+  ignore_errors: yes
+
+...
