@@ -1,0 +1,42 @@
+---
+
+- name: umount mountPath
+  shell:
+    umount -R
+    {{ part_infos.mountPath }} || true
+
+- block:
+  - name: check for cryptdevice
+    stat:
+      path: '{{ rootDevice }}'
+    register: cryptdevice
+  - name: close cryptdevice
+    shell:
+      cryptsetup
+      luksClose
+      {{ part_infos.partitions[1].mapperLabel }}
+    when: cryptdevice.stat.exists
+
+- name: Remove all partitions from disk
+  shell: sgdisk
+    --zap-all
+    /dev/{{ part_infos.device }}
+
+### TODO: check if it works with uefi flag
+- name: create partitions
+  shell: sgdisk
+    --set-alignment={{ item.alignment }}
+    --new={{ item.number }}:{{ item.part_start }}:{{ item.part_end }}
+    --change-name=0:"{{ item.partlabel }}"
+    --typecode=0:{{ item.type }}
+    /dev/{{ part_infos.device }}
+  with_items:
+    - "{% if not uefi %}{{ part_infos.bios }}{% endif %}"
+    - "{{ part_infos.partitions[0] }}"
+    - "{{ part_infos.partitions[1] }}"
+
+
+- include_tasks: 11-encrypted-rootfs.yml
+- include_tasks: 15-filesystem.yml
+
+...

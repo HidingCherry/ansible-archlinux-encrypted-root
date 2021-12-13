@@ -1,0 +1,43 @@
+---
+
+- block:
+  - name: check for cryptdevice
+    stat:
+      path: '{{ rootDevice }}'
+    register: cryptdevice
+  - name: close cryptdevice
+    shell:
+      cryptsetup
+      luksClose
+      {{ part_infos.partitions[1].mapperLabel }}
+    when: cryptdevice.stat.exists
+
+- name: encrypt root
+  shell:
+    bash -c "echo '{{ cryptsetup.password }}' |
+    cryptsetup
+    luksFormat
+    --cipher={{ cryptsetup.cipher }}
+    --hash={{ cryptsetup.hash }}
+    --key-size={{ cryptsetup.keySize }}
+    --batch-mode
+    --type={{ cryptsetup.type }}
+    {% if cryptsetup.iterTime is defined %}--iter-time={{ cryptsetup.iterTime }}
+    {% elif cryptsetup.pbkdfForceIterations %}--pbkdf-force-iterations={{ cryptsetup.pbkdfForceIterations }}
+    {% endif %}
+    --label={{ part_infos.partitions[1].cryptLabel }}
+    /dev/disk/by-partlabel/{{ part_infos.partitions[1].partlabel }}"
+
+- debug:
+    msg: "WARNING: opening cryptdevice with --allow-discards!"
+
+- name: open root cryptdevice
+  shell:
+    bash -c "echo '{{ cryptsetup.password }}' |
+    cryptsetup
+    --allow-discards
+    luksOpen
+    /dev/disk/by-partlabel/{{ part_infos.partitions[1].partlabel }}
+    {{ part_infos.partitions[1].mapperLabel }}"
+
+...

@@ -1,0 +1,6 @@
+---
+
+- name: Update the system clock
+  command: "timedatectl set-ntp true"
+
+...

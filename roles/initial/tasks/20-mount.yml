@@ -1,0 +1,65 @@
+---
+
+- debug:
+    msg: "WARNING: opening cryptdevice with --allow-discards!"
+
+- block:
+  - name: filesystem -> check for cryptdevice
+    stat:
+      path: '{{ rootDevice }}'
+    register: cryptdevice
+  - name: filesystem -> open root cryptdevice
+    shell:
+      bash -c "echo '{{ cryptsetup.password }}' |
+      cryptsetup
+      --allow-discards
+      luksOpen
+      /dev/disk/by-partlabel/{{ part_infos.partitions[1].partlabel }}
+      {{ part_infos.partitions[1].mapperLabel }}"
+    when: not cryptdevice.stat.exists
+
+- name: mount -> btrfs -> rootfs subvolume
+  ansible.posix.mount:
+    src: "LABEL={{ part_infos.partitions[1].fslabel }}"
+    opts: "{{ part_infos.partitions[1].rootfs.opts }}"
+    path: "{{ part_infos.mountPath }}{{ part_infos.partitions[1].rootfs.path }}"
+    state: mounted
+    fstype: "{{ part_infos.partitions[1].fstype }}"
+
+- block:
+  - name: create -> folder for boot
+    file:
+      path: "{{ part_infos.mountPath }}{{ part_infos.partitions[0].bootfs.path }}"
+      state: directory
+      mode: '0000'
+  - name: mount -> boot
+    mount:
+      src: "LABEL={{ part_infos.partitions[0].fslabel }}"
+      opts: "{{ part_infos.partitions[0].bootfs.opts }}"
+      path: "{{ part_infos.mountPath }}{{ part_infos.partitions[0].bootfs.path }}"
+      state: mounted
+      fstype: "{{ part_infos.partitions[0].fstype }}"
+
+- name: create -> folders for mounts
+  file:
+    path: "{{ part_infos.mountPath }}{{ item.path }}"
+    state: directory
+    mode: '0000'
+  with_items: "{{ part_infos.partitions[1].subvolumes }}"
+
+- name: mount -> btrfs -> subvolumes
+  mount:
+    src: "LABEL={{ part_infos.partitions[1].fslabel }}"
+    opts: "{{ item.opts }}"
+    path: "{{ part_infos.mountPath }}{{ item.path }}"
+    state: mounted
+    fstype: "{{ part_infos.partitions[1].fstype }}"
+  with_items: "{{ part_infos.partitions[1].subvolumes }}"
+
+- name: permission -> correct /var permission
+  file:
+    path: "{{ part_infos.mountPath }}/var"
+    state: directory
+    mode: '0755'
+
+...

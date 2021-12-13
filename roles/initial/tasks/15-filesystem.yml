@@ -1,0 +1,42 @@
+---
+
+- name: filesystem -> format bootfs
+  filesystem:
+    force: yes
+    dev: "/dev/{{ part_infos.device }}{{ part_infos.partitions[0].number }}"
+    fstype: "{{ part_infos.partitions[0].fstype }}"
+    opts: "{{ part_infos.partitions[0].createOpt }}"
+
+- name: filesystem -> format root
+  filesystem:
+    force: yes
+    dev: "{{ rootDevice }}"
+    fstype: "{{ part_infos.partitions[1].fstype }}"
+    opts: "{{ part_infos.partitions[1].createOpt }}"
+
+- block:
+  - name: filesystem -> check for cryptdevice
+    stat:
+      path: '{{ rootDevice }}'
+    register: cryptdevice
+  - name: filesystem -> open root cryptdevice
+    shell:
+      bash -c "echo '{{ cryptsetup.password }}' |
+      cryptsetup
+      luksOpen
+      /dev/disk/by-partlabel/{{ part_infos.partitions[1].partlabel }}
+      {{ part_infos.partitions[1].mapperLabel }}"
+    when: not cryptdevice.stat.exists
+
+- name: filesystem -> create subvolumes and equivalent folders
+  block:
+  - shell: "/usr/bin/mkdir -p {{ part_infos.mountPath }}.tmp"
+  - shell: "/usr/bin/mount -L {{ part_infos.partitions[1].fslabel }} {{ part_infos.mountPath }}.tmp"
+  - shell: "/usr/bin/btrfs subvolume create {{ part_infos.mountPath }}.tmp/{{ part_infos.partitions[1].rootfs.subvol }}"
+  - shell: "/usr/bin/btrfs subvolume create {{ part_infos.mountPath }}.tmp/{{ item.subvol }}"
+    with_items: "{{ part_infos.partitions[1].subvolumes }}"
+  - shell: "/usr/bin/umount {{ part_infos.mountPath }}.tmp"
+  - shell: "/usr/bin/rmdir {{ part_infos.mountPath }}.tmp"
+  when: part_infos.partitions[1].subvolumes is defined
+
+...
