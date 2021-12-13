@@ -1,5 +1,6 @@
 ---
 
 - include_tasks: 10-prep.yml
+- include_tasks: 20-setup.yml
 
 ...

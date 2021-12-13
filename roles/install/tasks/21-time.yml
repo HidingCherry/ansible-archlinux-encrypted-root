@@ -1,0 +1,10 @@
+---
+
+- name: set timezone
+  shell: "arch-chroot {{ part_infos.mountPath }} ln -sf /usr/share/zoneinfo/{{ install.timezone }} /etc/localtime"
+
+- name: execute hwclock
+  shell: "arch-chroot {{ part_infos.mountPath }} hwclock --systohc"
+  when: ansible_facts.virtualization_type is not defined
+
+...

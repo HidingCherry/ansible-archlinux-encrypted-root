@@ -1,0 +1,9 @@
+---
+
+- include_tasks: 21-time.yml
+- include_tasks: 22-locale.yml
+- include_tasks: 23-network.yml
+- include_tasks: 24-sudoers.yml
+- include_tasks: 25-sshd.yml
+
+...

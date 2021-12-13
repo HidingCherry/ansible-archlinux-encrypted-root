@@ -1,5 +1,7 @@
 ---
 
+hostname: "archlinux"
+
 cryptsetup:
   ### REMEMBER: iterTime and pbkdfForceIterations CANNOT be used together!
   ### REMEMBER2: iterTime depends on the CPU, so iterTime on one system will be different than on another system.
@@ -77,5 +79,34 @@ part_infos:
       opts: "subvol=@varlog,lazytime,space_cache,autodefrag,compress=zstd:2"
 
 rootDevice: '/dev/mapper/{{ part_infos.partitions[1].mapperLabel }}'
+
+network:
+  initrd: |
+    [Match]
+    Name=eth0
+
+    [Network]
+    Address=IPV4/SUBNET
+    Gateway=GWIPV4
+
+systemdNetworkd:
+  interfaces:
+    eno1: "eno1 eth0"
+  network:
+    eno1: |
+      [Match]
+      Name=INTERFACE-NAMES
+
+      [Network]
+      Address=IPV4/SUBNET
+      Gateway=GWIPV4
+
+      #DHCP=ipv6
+      Address=IPV6/SUBNET
+      #IPv6AcceptRA=true
+
+      #[DHCPv6]
+      #DUIDType=link-layer
+      #DUIDRawData=SOMEDUID
 
 ...

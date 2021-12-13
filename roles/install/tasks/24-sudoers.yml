@@ -1,0 +1,9 @@
+---
+
+- name: sudoers -> add wheel group
+  lineinfile:
+    path: "{{ part_infos.mountPath }}/etc/sudoers"
+    regexp: '(# )?%wheel ALL=\(ALL\) ALL'
+    line: '%wheel ALL=(ALL) ALL'
+
+...

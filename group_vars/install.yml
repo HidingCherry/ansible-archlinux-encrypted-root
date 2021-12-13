@@ -24,4 +24,8 @@ install:
 # tinyssh-convert
 ### END   encrypted system
 
+  timezone: "Europe/Berlin"
+
+localdomain: "lan"
+
 ...
