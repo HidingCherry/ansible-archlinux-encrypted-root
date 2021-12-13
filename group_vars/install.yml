@@ -1,0 +1,27 @@
+---
+
+install:
+  pacstrap: >
+    base
+    linux-hardened
+    linux-firmware
+    bind
+    btrfs-progs
+    cryptsetup
+    moreutils
+    nano
+    openssh
+    sudo
+    mkinitcpio-systemd-tool
+    tinyssh
+    tinyssh-convert
+# bind for dig, host, nslookup
+# linux-hardened-headers - bloat for kvm image
+# linux-firmware - bloat for kvm image, needed?
+### START encrypted system
+# mkinitcpio-systemd-tool
+# tinyssh
+# tinyssh-convert
+### END   encrypted system
+
+...

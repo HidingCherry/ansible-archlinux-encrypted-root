@@ -1,0 +1,12 @@
+---
+
+- name: execute pacstrap
+  shell: '/usr/bin/pacstrap {{ part_infos.mountPath }} {{ install.pacstrap }}'
+
+- name: execute partprobe
+  shell: '/usr/bin/partprobe /dev/mapper/{{ part_infos.partitions[1].mapperLabel }}'
+
+- name: execute genfstab
+  shell: '/usr/bin/genfstab -U {{ part_infos.mountPath }} >> {{ part_infos.mountPath }}/etc/fstab'
+
+...
