@@ -1,0 +1,6 @@
+---
+
+- include_tasks: 61-microcode.yml
+- include_tasks: 62-grub.yml
+
+...

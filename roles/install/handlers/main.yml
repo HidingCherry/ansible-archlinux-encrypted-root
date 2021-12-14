@@ -5,4 +5,8 @@
   listen: regenerate initramfs
   ignore_errors: yes
 
+- name: run grub-mkconfig
+  shell: arch-chroot {{ part_infos.mountPath }} grub-mkconfig -o /boot/grub/grub.cfg
+  listen: regenerate grub.cfg
+
 ...

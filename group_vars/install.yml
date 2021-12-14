@@ -1,6 +1,7 @@
 ---
 
 install:
+  installCmd: 'pacman -S --noconfirm'
   pacstrap: >
     base
     linux-hardened
@@ -27,6 +28,9 @@ install:
   timezone: "Europe/Berlin"
 
 localdomain: "lan"
+
+bootloader:
+  timeout: "0"
 
 user:
   - name: user999

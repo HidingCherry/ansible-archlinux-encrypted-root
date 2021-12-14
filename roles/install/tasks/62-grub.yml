@@ -1,0 +1,31 @@
+---
+- name: install grub
+  shell: 'arch-chroot {{ part_infos.mountPath }} {{ install.installCmd }} grub'
+
+- name: replace grub-timeout
+  lineinfile:
+    path: "{{ part_infos.mountPath }}/etc/default/grub"
+    regexp: '^GRUB_TIMEOUT=\d+'
+    line: "GRUB_TIMEOUT={{ bootloader.timeout }}"
+  notify: regenerate grub.cfg
+
+- name: disable grub-distributor
+  lineinfile:
+    path: "{{ part_infos.mountPath }}/etc/default/grub"
+    regexp: '^GRUB_DISTRIBUTOR="(.*)"'
+    line: '#GRUB_DISTRIBUTOR="\g<1>"'
+  notify: regenerate grub.cfg
+
+- name: remove loglevel
+  lineinfile:
+    path: "{{ part_infos.mountPath }}/etc/default/grub"
+    regexp: '^GRUB_CMDLINE_LINUX_DEFAULT="(.*)(loglevel=\d)?(.*")'
+    line: 'GRUB_CMDLINE_LINUX_DEFAULT="\g<1>\g<3>'
+    backrefs: yes
+  notify: regenerate grub.cfg
+
+- name: execute grub-install
+  shell: arch-chroot {{ part_infos.mountPath }} grub-install --target=i386-pc /dev/{{ part_infos.device }}
+  notify: regenerate grub.cfg
+
+...
