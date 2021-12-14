@@ -1,6 +1,7 @@
 ---
 
 hostname: "archlinux"
+kernelModules: ""
 
 cryptsetup:
   ### REMEMBER: iterTime and pbkdfForceIterations CANNOT be used together!

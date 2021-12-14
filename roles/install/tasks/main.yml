@@ -4,5 +4,6 @@
 - include_tasks: 20-setup.yml
 - include_tasks: 30-users.yml
 - include_tasks: 40-headless.yml
+- include_tasks: 50-mkinitramfs.yml
 
 ...

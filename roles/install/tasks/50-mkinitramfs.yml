@@ -1,0 +1,14 @@
+---
+
+- name: insert kernelModules into mkinitcpio.conf
+  replace:
+    backup: yes
+    after: 'MODULES'
+    before: '# BINARIES'
+    path: "{{ part_infos.mountPath }}/etc/mkinitcpio.conf"
+    regexp: '^MODULES=\( *\)$'
+    replace: 'MODULES=({{ kernelModules }})'
+  when: kernelModules is defined
+  notify: regenerate initramfs
+
+...
