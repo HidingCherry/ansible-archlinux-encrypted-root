@@ -93,7 +93,7 @@ That's it for the ansible howto.
 
 Install `qemu` for a qemu VM.
 
-- Create a folder, where you want to safe your VM files.
+- Create a folder, where you want to save your VM files.
 - Download the archlinux iso or create your own (use the legendary arch-wiki)
 - Create a virtual HDD: `qemu-img create arch-vm.img 2.5G`
 - Start the vm:
