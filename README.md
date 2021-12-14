@@ -117,7 +117,7 @@ I use this commandline to start the VM - BIOS mode, not EFI.
 For EFI you need a bios-file - then add something like that as a parameter `-bios uefi.nosecureboot.bin`.
 You would need to use the archwiki for that file - although I'm sure there is some ready-to-go file shipped with qemu.
 
-Be sure to change `-smp` and `-m` according to your needs (especially for the encryption/decryption for cryptsetup they are important since argon2id is default).
+Be sure to change `-smp` (cores) and `-m` (memory in MB) according to your needs (especially for the encryption/decryption for cryptsetup they are important since argon2id is default).
 
 After you've run the playbook on that vm, unmount everything with `umount -A /mnt/*` and `umount -A /mnt`, then shutdown the vm.
 
