@@ -86,4 +86,51 @@ You have the inventory and the playbook ready - and created your own host_vars/M
 ansible-playbook -i inventory.ini install.yml
 ```
 
-That's it - I will provide a simple tutorial for how to create and transport/write a VM image to a server later.
+That's it for the ansible howto.
+
+
+## Prepare a VM image with qemu
+
+Install `qemu` for a qemu VM.
+
+- Create a folder, where you want to safe your VM files.
+- Download the archlinux iso or create your own (use the legendary arch-wiki)
+- Create a virtual HDD: `qemu-img create arch-vm.img 2.5G`
+- Start the vm:
+```bash
+#!/bin/bash
+
+qemu-system-x86_64 \
+-accel kvm \
+-smp 2 \
+-m 1536 \
+-boot order=dc \
+-cdrom archlinux-x86_64.iso \
+-drive file=arch-vm.img,cache=writeback,media=disk,discard=unmap,detect-zeroes=unmap \
+-device e1000,netdev=net0 \
+-device virtio-rng-pci \
+-netdev user,id=net0,hostfwd=tcp::5555-:22
+```
+
+I use this commandline to start the VM - BIOS mode, not EFI.
+
+For EFI you need a bios-file - then add something like that as a parameter `-bios uefi.nosecureboot.bin`.
+You would need to use the archwiki for that file - although I'm sure there is some ready-to-go file shipped with qemu.
+
+Be sure to change `-smp` and `-m` according to your needs (especially for the encryption/decryption for cryptsetup they are important since argon2id is default).
+
+After you've run the playbook on that vm, unmount everything with `umount -A /mnt/*` and `umount -A /mnt`, then shutdown the vm.
+
+Your image is ready, be aware that the discard feature is active, this heavily impacts the security of encryption - so be sure overwrite that empty space after you've booted into it. If you want to be very secure - deactivate __all__ discard and fstrim commands/parameters inside both roles. Then - before you unmount everything, overwrite the empty space with random data. This will bloat your VM image - but it will be safe.
+
+To push the file onto the server/destination, I use some _simple_ piping:
+```bash
+tar -cjO arch-vm.img | ssh MyHostname bash -c 'cat | tar -xjOf - | sudo dd of=/dev/sda bs=500k iflag=fullblock oflag=direct status=progress'
+```
+
+This works if your System is running on a recovery OS or from some USB stick. I am pretty sure you have at least one of them.
+
+If you have neither - then you'ld need to do some magic and put the image into a loop-device and write the partitions from there to the disk - don't forget to run a grub-install while your new boot-partition is mounted on _/boot_.
+(I am not giving further support for writing the image on a live-running system - you should already know what you're doing at this point.)
+
+That's basically it - with the VM image thing, it's also pretty straight forward.
