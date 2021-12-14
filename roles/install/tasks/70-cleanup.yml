@@ -1,0 +1,13 @@
+---
+
+- name: delete package cache
+  shell: 'arch-chroot {{ part_infos.mountPath }} pacman -Scc --noconfirm'
+
+- name: remount with discard
+  shell: 'mount -o remount,discard {{ part_infos.mountPath }}'
+
+- name: perform fstrim
+  shell: 'fstrim -a'
+  ignore_errors: yes
+
+...
