@@ -67,17 +67,17 @@ part_infos:
     rootfs:
       subvol: "@rootfs"
       path: "/"
-      opts: "subvol=@rootfs,lazytime,space_cache,autodefrag,compress=zstd:2"
+      opts: "subvol=@rootfs,lazytime,autodefrag,compress=zstd:2"
     subvolumes:
     - subvol: "@home"
       path: "/home"
-      opts: "subvol=@home,lazytime,space_cache,autodefrag,compress=zstd:2"
+      opts: "subvol=@home,lazytime,autodefrag,compress=zstd:2"
     - subvol: "@varcache"
       path: "/var/cache"
-      opts: "subvol=@varcache,lazytime,space_cache"
+      opts: "subvol=@varcache,lazytime"
     - subvol: "@varlog"
       path: "/var/log"
-      opts: "subvol=@varlog,lazytime,space_cache,autodefrag,compress=zstd:2"
+      opts: "subvol=@varlog,lazytime,autodefrag,compress=zstd:2"
 
 rootDevice: '/dev/mapper/{{ part_infos.partitions[1].mapperLabel }}'
 
