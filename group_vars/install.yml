@@ -9,6 +9,7 @@ install:
     bind
     btrfs-progs
     cryptsetup
+    inetutils
     moreutils
     nano
     openssh
