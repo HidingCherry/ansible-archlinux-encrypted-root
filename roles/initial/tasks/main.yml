@@ -1,6 +1,6 @@
 ---
 
-- include_tasks: 00-temporary-setup.yml
+- include_tasks: 00-preparation.yml
 - include_tasks: 10-partition.yml
 - include_tasks: 20-mount.yml
 
