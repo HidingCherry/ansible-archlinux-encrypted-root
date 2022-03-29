@@ -37,7 +37,7 @@ part_infos:
   - partition: "boot"
     alignment: "2048"
     partlabel: "boot"
-    part_start: "2M"
+    part_start: "0"
     part_end: "+256M"
     number: 1
     type: "0x8300"
