@@ -1,6 +1,13 @@
 ---
 
 - include_tasks: 61-microcode.yml
+
+
+- name: Check for uefi firmware
+  stat:
+    path: /sys/firmware/efi
+  register: efiFirmware
+
 - include_tasks: 62-grub.yml
 
 ...

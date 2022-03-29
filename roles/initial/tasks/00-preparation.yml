@@ -3,4 +3,9 @@
 - name: Update the system clock
   command: "timedatectl set-ntp true"
 
+- name: Check for uefi firmware
+  stat:
+    path: /sys/firmware/efi
+  register: efiFirmware
+
 ...
