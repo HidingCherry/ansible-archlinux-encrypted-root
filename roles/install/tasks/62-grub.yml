@@ -1,4 +1,5 @@
 ---
+
 - name: install grub
   shell: 'arch-chroot {{ part_infos.mountPath }} {{ install.installCmd }} grub'
 
