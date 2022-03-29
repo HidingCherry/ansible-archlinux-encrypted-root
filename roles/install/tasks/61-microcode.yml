@@ -5,7 +5,7 @@
   with_items:
   - '{{ install.installCmd }} amd-ucode'
   - '{{ install.installCmd }} intel-ucode'
-  when: ansible_facts.virtualization_type is defined
+  when: ansible_facts.virtualization_role == "guest"
 
 - name: install microcode for AMD
   command: "arch-chroot {{ part_infos.mountPath }} {{ install.installCmd }} amd-ucode"
