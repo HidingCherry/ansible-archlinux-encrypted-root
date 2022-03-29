@@ -2,6 +2,7 @@
 
 - debug:
     msg: "WARNING: opening cryptdevice with --allow-discards!"
+  when: allowDiscards
 
 - block:
   - name: filesystem -> check for cryptdevice
@@ -12,7 +13,7 @@
     shell:
       bash -c "echo '{{ cryptsetup.password }}' |
       cryptsetup
-      --allow-discards
+      {% if allowDiscards %}--allow-discards{% endif %}
       luksOpen
       /dev/disk/by-partlabel/{{ part_infos.partitions[1].partlabel }}
       {{ part_infos.partitions[1].mapperLabel }}"
