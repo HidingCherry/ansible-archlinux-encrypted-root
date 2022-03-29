@@ -28,15 +28,20 @@
       {{ part_infos.partitions[1].mapperLabel }}"
     when: not cryptdevice.stat.exists
 
-- name: filesystem -> create subvolumes and equivalent folders
-  block:
-  - shell: "/usr/bin/mkdir -p {{ part_infos.mountPath }}.tmp"
-  - shell: "/usr/bin/mount -L {{ part_infos.partitions[1].fslabel }} {{ part_infos.mountPath }}.tmp"
-  - shell: "/usr/bin/btrfs subvolume create {{ part_infos.mountPath }}.tmp/{{ part_infos.partitions[1].rootfs.subvol }}"
-  - shell: "/usr/bin/btrfs subvolume create {{ part_infos.mountPath }}.tmp/{{ item.subvol }}"
+- block:
+  - name: filesystem -> create folder {{ part_infos.mountPath }}.tmp
+    shell: "/usr/bin/mkdir -p {{ part_infos.mountPath }}.tmp"
+  - name: filesystem -> mount {{ part_infos.partitions[1].fslabel }} to {{ part_infos.mountPath }}.tmp
+    shell: "/usr/bin/mount -L {{ part_infos.partitions[1].fslabel }} {{ part_infos.mountPath }}.tmp"
+  - name: filesystem -> create subvolume {{ part_infos.partitions[1].fslabel }}/{{ part_infos.partitions[1].rootfs.subvol }}
+    shell: "/usr/bin/btrfs subvolume create {{ part_infos.mountPath }}.tmp/{{ part_infos.partitions[1].rootfs.subvol }}"
+  - name: filesystem -> create subvolume {{ part_infos.partitions[1].fslabel }}/{{ item.subvol }}
+    shell: "/usr/bin/btrfs subvolume create {{ part_infos.mountPath }}.tmp/{{ item.subvol }}"
     with_items: "{{ part_infos.partitions[1].subvolumes }}"
-  - shell: "/usr/bin/umount {{ part_infos.mountPath }}.tmp"
-  - shell: "/usr/bin/rmdir {{ part_infos.mountPath }}.tmp"
+  - name: filesystem -> unmount {{ part_infos.partitions[1].fslabel }}
+    shell: "/usr/bin/umount {{ part_infos.mountPath }}.tmp"
+  - name: filesystem -> remove folder {{ part_infos.mountPath }}.tmp
+    shell: "/usr/bin/rmdir {{ part_infos.mountPath }}.tmp"
   when: part_infos.partitions[1].subvolumes is defined
 
 ...
