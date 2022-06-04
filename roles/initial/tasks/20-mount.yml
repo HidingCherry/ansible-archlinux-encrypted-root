@@ -62,6 +62,7 @@
     state: directory
     mode: '0000'
   with_items: "{{ part_infos.partitions[1].subvolumes }}"
+  when: part_infos.partitions[1].subvolumes is defined
 
 - name: mount -> btrfs -> subvolumes
   mount:
@@ -71,6 +72,7 @@
     state: mounted
     fstype: "{{ part_infos.partitions[1].fstype }}"
   with_items: "{{ part_infos.partitions[1].subvolumes }}"
+  when: part_infos.partitions[1].subvolumes is defined
 
 - name: permission -> correct /var permission
   file:
