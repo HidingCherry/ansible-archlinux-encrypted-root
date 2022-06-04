@@ -33,6 +33,22 @@ part_infos:
     number: 10
     type: "0xEF02"
 
+  uefi:
+    alignment: "2048"
+    partlabel: "EFI"
+    part_start: "0"
+    part_end: "128M"
+    number: 10
+    type: "bc13c2ff-59e6-4262-a352-b275fd6f7172"
+
+    fstype: "vfat"
+    fslabel: "EFIfs"
+    createOpt: "-F 32 -n EFIfs"
+
+    EFIfs:
+      path: "/efi"
+      opts: "lazytime,umask=0077" ### umask only with vfat
+
   partitions:
   - partition: "boot"
     alignment: "2048"

@@ -41,6 +41,21 @@
       state: mounted
       fstype: "{{ part_infos.partitions[0].fstype }}"
 
+- block:
+  - name: create -> folder for efi
+    file:
+      path: "{{ part_infos.mountPath }}{{ part_infos.uefi.EFIfs.path }}"
+      state: directory
+      mode: '0000'
+  - name: mount -> efi
+    mount:
+      src: "LABEL={{ part_infos.uefi.fslabel }}"
+      opts: "{{ part_infos.uefi.EFIfs.opts }}"
+      path: "{{ part_infos.mountPath }}{{ part_infos.uefi.EFIfs.path }}"
+      state: mounted
+      fstype: "{{ part_infos.uefi.fstype }}"
+  when: efiFirmware.stat.exists
+
 - name: create -> folders for mounts
   file:
     path: "{{ part_infos.mountPath }}{{ item.path }}"

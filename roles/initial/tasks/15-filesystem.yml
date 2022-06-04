@@ -1,5 +1,13 @@
 ---
 
+- name: filesystem -> format EFIfs
+  filesystem:
+    force: yes
+    dev: "/dev/{{ part_infos.device }}{{ part_infos.uefi.number }}"
+    fstype: "{{ part_infos.uefi.fstype }}"
+    opts: "{{ part_infos.uefi.createOpt }}"
+  when: efiFirmware.stat.exists
+
 - name: filesystem -> format bootfs
   filesystem:
     force: yes
