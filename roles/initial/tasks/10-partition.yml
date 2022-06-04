@@ -22,7 +22,17 @@
     --zap-all
     /dev/{{ part_infos.device }}
 
-### TODO: check if it works with uefi flag
+- name: create biosBoot partition
+  shell: sgdisk
+    --set-alignment={{ item.alignment }}
+    --new={{ item.number }}:{{ item.part_start }}:{{ item.part_end }}
+    --change-name=0:"{{ item.partlabel }}"
+    --typecode=0:{{ item.type }}
+    /dev/{{ part_infos.device }}
+  with_items:
+    - "{{ part_infos.bios }}"
+  when: not efiFirmware.stat.exists
+
 - name: create partitions
   shell: sgdisk
     --set-alignment={{ item.alignment }}
@@ -31,7 +41,6 @@
     --typecode=0:{{ item.type }}
     /dev/{{ part_infos.device }}
   with_items:
-    - "{% if not uefi %}{{ part_infos.bios }}{% endif %}"
     - "{{ part_infos.partitions[0] }}"
     - "{{ part_infos.partitions[1] }}"
 
