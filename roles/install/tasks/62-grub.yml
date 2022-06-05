@@ -15,6 +15,7 @@
     path: "{{ part_infos.mountPath }}/etc/default/grub"
     regexp: '^GRUB_DISTRIBUTOR="(.*)"'
     line: '#GRUB_DISTRIBUTOR="\g<1>"'
+    backrefs: yes
   notify: regenerate grub.cfg
 
 - name: remove loglevel
