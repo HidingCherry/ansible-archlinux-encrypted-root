@@ -1,7 +1,7 @@
 ---
 
 - name: update archlinux-keyring
-  shell: '/usr/bin/pacman -Sy archlinux-keyring'
+  shell: '/usr/bin/pacman -Sy --noconfirm archlinux-keyring'
 
 - name: execute pacstrap
   shell: '/usr/bin/pacstrap {{ part_infos.mountPath }} {{ install.pacstrap }}'
