@@ -58,7 +58,7 @@ part_infos:
     number: 1
     type: "0x8300"
 
-    fstype: "ext2"
+    fstype: "ext4"
     fslabel: "bootfs"
     createOpt: "-F -L bootfs"
 
