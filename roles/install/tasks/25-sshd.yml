@@ -1,6 +1,6 @@
 ---
 
 - name: enable sshd
-  shell: 'arch-chroot {{ part_infos.mountPath }} systemctl enable sshd'
+  shell: 'arch-chroot {{ storage.mountPath }} systemctl enable sshd'
 
 ...

@@ -3,13 +3,13 @@
 - block:
   - name: check for cryptdevice
     stat:
-      path: '{{ rootDevice }}'
+      path: '/dev/mapper/{{ storage.partitions.root.label.mapper }}'
     register: cryptdevice
   - name: close cryptdevice
     shell:
       cryptsetup
       luksClose
-      {{ part_infos.partitions[1].mapperLabel }}
+      {{ storage.partitions.root.label.mapper }}
     when: cryptdevice.stat.exists
 
 - name: encrypt root
@@ -25,20 +25,20 @@
     {% if cryptsetup.iterTime is defined %}--iter-time={{ cryptsetup.iterTime }}
     {% elif cryptsetup.pbkdfForceIterations %}--pbkdf-force-iterations={{ cryptsetup.pbkdfForceIterations }}
     {% endif %}
-    --label={{ part_infos.partitions[1].cryptLabel }}
-    /dev/disk/by-partlabel/{{ part_infos.partitions[1].partlabel }}"
+    --label={{ storage.partitions.root.label.crypt }}
+    /dev/disk/by-partlabel/{{ storage.partitions.root.encrypted.label }}"
 
 - debug:
     msg: "WARNING: opening cryptdevice with --allow-discards!"
-  when: allowDiscards
+  when: partitions.allowDiscards
 
 - name: open root cryptdevice
   shell:
     bash -c "echo '{{ cryptsetup.password }}' |
     cryptsetup
-    {% if allowDiscards %}--allow-discards{% endif %}
+    {% if partitions.allowDiscards %}--allow-discards{% endif %}
     luksOpen
-    /dev/disk/by-partlabel/{{ part_infos.partitions[1].partlabel }}
-    {{ part_infos.partitions[1].mapperLabel }}"
+    /dev/disk/by-partlabel/{{ storage.partitions.root.encrypted.label }}
+    {{ storage.partitions.root.label.mapper }}"
 
 ...

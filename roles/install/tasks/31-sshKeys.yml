@@ -1,11 +1,11 @@
 ---
 
 - name: get home-directory
-  shell: 'arch-chroot {{ part_infos.mountPath }} bash -c "grep {{ user_loop.name }} /etc/passwd | cut -d: -f6"'
+  shell: 'arch-chroot {{ storage.mountPath }} bash -c "grep {{ user_loop.name }} /etc/passwd | cut -d: -f6"'
   register: user_home
 
 - name: sshKeys and permissions
-  shell: 'arch-chroot {{ part_infos.mountPath }} {{ item }}'
+  shell: 'arch-chroot {{ storage.mountPath }} {{ item }}'
   with_items:
     - 'mkdir -p {{ user_home.stdout }}/.ssh/'
     - 'bash -c ''echo "{{ user_loop.sshKeys }}" >> {{ user_home.stdout }}/.ssh/authorized_keys'''

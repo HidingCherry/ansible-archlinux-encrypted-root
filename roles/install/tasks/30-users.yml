@@ -1,11 +1,11 @@
 ---
 
 - name: add users
-  command: "arch-chroot {{ part_infos.mountPath }} useradd {{ item.useraddParams }} {{ item.name }}"
+  command: "arch-chroot {{ storage.mountPath }} useradd {{ item.addParams }} {{ item.name }}"
   with_items: "{{ user }}"
 
 - name: add user.password
-  shell: "/usr/bin/bash -c \"printf '{{ item.password }}\n{{ item.password }}\n'\" | arch-chroot {{ part_infos.mountPath }} passwd {{ item.name }}"
+  shell: "/usr/bin/bash -c \"printf '{{ item.password }}\n{{ item.password }}\n'\" | arch-chroot {{ storage.mountPath }} passwd {{ item.name }}"
   when: item.password is defined
   with_items: "{{ user }}"
 
@@ -17,7 +17,7 @@
     label: "{{ user_loop.name }}"
 
 - name: sshKey and permission for root
-  shell: 'arch-chroot {{ part_infos.mountPath }} {{ item }}'
+  shell: 'arch-chroot {{ storage.mountPath }} {{ item }}'
   with_items:
     - 'mkdir -p /root/.ssh/'
     - 'bash -c "echo ''{{ user[0].sshKeys }}'' > /root/.ssh/authorized_keys"'
@@ -27,6 +27,6 @@
     - 'ssh-keygen -f /etc/ssh/ssh_host_ed25519_key -N "" -t ed25519'
 
 - name: lock root
-  command: "arch-chroot {{ part_infos.mountPath }} passwd -l root"
+  command: "arch-chroot {{ storage.mountPath }} passwd -l root"
 
 ...

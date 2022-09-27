@@ -3,53 +3,53 @@
 - name: filesystem -> format EFIfs
   filesystem:
     force: yes
-    dev: "/dev/{{ part_infos.device }}{{ part_infos.uefi.number }}"
-    fstype: "{{ part_infos.uefi.fstype }}"
-    opts: "{{ part_infos.uefi.createOpt }}"
+    dev: "/dev/{{ storage.device }}{{ firmware.uefi.number }}"
+    fstype: "{{ firmware.uefi.fs.type }}"
+    opts: "{{ firmware.uefi.createOpt }}"
   when: efiFirmware.stat.exists
 
 - name: filesystem -> format bootfs
   filesystem:
     force: yes
-    dev: "/dev/{{ part_infos.device }}{{ part_infos.partitions[0].number }}"
-    fstype: "{{ part_infos.partitions[0].fstype }}"
-    opts: "{{ part_infos.partitions[0].createOpt }}"
+    dev: "/dev/{{ storage.device }}{{ storage.partitions.boot.number }}"
+    fstype: "{{ storage.partitions.boot.decrypted.type }}"
+    opts: "{{ storage.partitions.boot.decrypted.createOpt }}"
 
-- name: filesystem -> format root
+- name: filesystem -> format rootfs
   filesystem:
     force: yes
-    dev: "{{ rootDevice }}"
-    fstype: "{{ part_infos.partitions[1].fstype }}"
-    opts: "{{ part_infos.partitions[1].createOpt }}"
+    dev: "/dev/mapper/{{ storage.partitions.root.label.mapper }}"
+    fstype: "{{ storage.partitions.root.decrypted.type }}"
+    opts: "{{ storage.partitions.root.decrypted.createOpt }}"
 
 - block:
   - name: filesystem -> check for cryptdevice
     stat:
-      path: '{{ rootDevice }}'
+      path: '/dev/mapper/{{ storage.partitions.root.label.mapper }}'
     register: cryptdevice
   - name: filesystem -> open root cryptdevice
     shell:
       bash -c "echo '{{ cryptsetup.password }}' |
       cryptsetup
       luksOpen
-      /dev/disk/by-partlabel/{{ part_infos.partitions[1].partlabel }}
-      {{ part_infos.partitions[1].mapperLabel }}"
+      /dev/disk/by-partlabel/{{ storage.partitions.root.encrypted.label }}
+      {{ storage.partitions.root.label.mapper }}"
     when: not cryptdevice.stat.exists
 
 - block:
-  - name: filesystem -> create folder {{ part_infos.mountPath }}.tmp
-    shell: "/usr/bin/mkdir -p {{ part_infos.mountPath }}.tmp"
-  - name: filesystem -> mount {{ part_infos.partitions[1].fslabel }} to {{ part_infos.mountPath }}.tmp
-    shell: "/usr/bin/mount -L {{ part_infos.partitions[1].fslabel }} {{ part_infos.mountPath }}.tmp"
-  - name: filesystem -> create subvolume {{ part_infos.partitions[1].fslabel }}/{{ part_infos.partitions[1].rootfs.subvol }}
-    shell: "/usr/bin/btrfs subvolume create {{ part_infos.mountPath }}.tmp/{{ part_infos.partitions[1].rootfs.subvol }}"
-  - name: filesystem -> create subvolume {{ part_infos.partitions[1].fslabel }}/{{ item.subvol }}
-    shell: "/usr/bin/btrfs subvolume create {{ part_infos.mountPath }}.tmp/{{ item.subvol }}"
-    with_items: "{{ part_infos.partitions[1].subvolumes }}"
-  - name: filesystem -> unmount {{ part_infos.partitions[1].fslabel }}
-    shell: "/usr/bin/umount {{ part_infos.mountPath }}.tmp"
-  - name: filesystem -> remove folder {{ part_infos.mountPath }}.tmp
-    shell: "/usr/bin/rmdir {{ part_infos.mountPath }}.tmp"
-  when: part_infos.partitions[1].subvolumes is defined
+  - name: filesystem -> create folder {{ storage.mountPath }}.tmp
+    shell: "/usr/bin/mkdir -p {{ storage.mountPath }}.tmp"
+  - name: filesystem -> mount {{ storage.partitions.root.decrypted.label }} to {{ storage.mountPath }}.tmp
+    shell: "/usr/bin/mount -L {{ storage.partitions.root.decrypted.label }} {{ storage.mountPath }}.tmp"
+  - name: filesystem -> create subvolume {{ storage.partitions.root.decrypted.label }}{{ storage.partitions.root.decrypted.path }}
+    shell: "/usr/bin/btrfs subvolume create {{ storage.mountPath }}.tmp{{ storage.partitions.root.decrypted.path }}"
+  - name: filesystem -> create subvolume {{ storage.partitions.root.decrypted.label }}{{ item.path }}
+    shell: "/usr/bin/btrfs subvolume create {{ storage.mountPath }}.tmp{{ item.path }}"
+    with_items: "{{ storage.partitions.root.decrypted.subvolumes }}"
+  - name: filesystem -> unmount {{ storage.partitions.root.decrypted.label }}
+    shell: "/usr/bin/umount {{ storage.mountPath }}.tmp"
+  - name: filesystem -> remove folder {{ storage.mountPath }}.tmp
+    shell: "/usr/bin/rmdir {{ storage.mountPath }}.tmp"
+  when: storage.partitions.root.decrypted.subvolumes is defined
 
 ...

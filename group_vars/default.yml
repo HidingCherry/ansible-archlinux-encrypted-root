@@ -1,0 +1,8 @@
+---
+
+default:
+  bootloader:
+    timeout: "0"
+  timezone: "Europe/Berlin"
+
+...

@@ -1,0 +1,28 @@
+---
+
+firmware:
+  bios:
+    layout:
+      alignment: "1"
+      end: "2047"
+      label: "biosBoot"
+      start: "34"
+    number: 10
+    type: "0xEF02"
+  uefi:
+    createOpt: "-F 32 -n EFIfs"
+    EFIfs:
+      opts: "lazytime, umask=0077" ### umask only with vfat
+      path: "/efi"
+    fs:
+      label: "EFIfs"
+      type: "vfat"
+    layout:
+      alignment: "2048"
+      end: "128M"
+      label: "EFI"
+      start: "0"
+    number: 10
+    type: "bc13c2ff-59e6-4262-a352-b275fd6f7172"
+
+...

@@ -1,0 +1,49 @@
+---
+
+storage:
+  allowDiscards: true
+  device: "sda"
+  encrypted: true
+  mountPath: "/mnt"
+  partitions:
+    boot:
+      decrypted:
+        createOpt: "-F -L bootfs"
+        label: "bootfs"
+        opts: "lazytime" # , umask=0077" ### umask only with vfat
+        path: "/boot"
+        type: "ext4"
+      encrypted:
+        alignment: "2048"
+        end: "+256M"
+        label: "boot"
+        start: "0"
+        type: "0x8300"
+      number: 1
+    root:
+      decrypted:
+        createOpt: "-f -L rootfs --csum xxhash"
+        label: "rootfs"
+        opts: "autodefrag, compress=zstd:2, lazytime, subvol="
+        path: "/"
+        subvolumes:
+          - opts: "autodefrag, compress=zstd:2, lazytime, subvol="
+            path: "/home"
+          - opts: "lazytime, subvol="
+            path: "/var/cache"
+          - opts: "autodefrag, compress=zstd:2, lazytime, subvol="
+            path: "/var/log"
+        type: "btrfs"
+      encrypted:
+        label: "root"
+        sector:
+          alignment: "2048"
+          end: "0"   # <- 0 = max available sector
+          start: "0"   # <- 0 = min available sector
+        type: "0x8308"
+      label:
+        crypt: "root.encrypted"
+        mapper: "root.decrypted"
+      number: 2
+
+...

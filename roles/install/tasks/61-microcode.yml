@@ -1,18 +1,18 @@
 ---
 
 - name: install both microcodes
-  shell: 'arch-chroot {{ part_infos.mountPath }} {{ item }}'
+  shell: 'arch-chroot {{ storage.mountPath }} {{ item }}'
   with_items:
-  - '{{ install.installCmd }} amd-ucode'
-  - '{{ install.installCmd }} intel-ucode'
+  - '{{ install.cmd }} amd-ucode'
+  - '{{ install.cmd }} intel-ucode'
   when: ansible_facts.virtualization_role == "guest"
 
 - name: install microcode for AMD
-  command: "arch-chroot {{ part_infos.mountPath }} {{ install.installCmd }} amd-ucode"
+  command: "arch-chroot {{ storage.mountPath }} {{ install.cmd }} amd-ucode"
   when: ansible_facts.processor.1 == "AuthenticAMD"
 
 - name: install microcode for Intel
-  shell: "arch-chroot {{ part_infos.mountPath }} {{ install.installCmd }} intel-ucode"
+  shell: "arch-chroot {{ storage.mountPath }} {{ install.cmd }} intel-ucode"
   when: ansible_facts.processor.1 == "GenuineIntel"
 
 ...

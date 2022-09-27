@@ -8,6 +8,6 @@
 - include_tasks: 60-bootloader.yml
 
 - include_tasks: 70-cleanup.yml
-  when: allowDiscards
+  when: partitions.allowDiscards
 
 ...

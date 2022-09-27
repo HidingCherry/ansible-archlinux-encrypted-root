@@ -1,0 +1,10 @@
+---
+
+user:
+  - name: user999
+    addParams: "--groups wheel --create-home --shell /bin/bash --user-group"
+    password: 'example'
+    sshKeys: |
+      ssh-ed25519 CHANGEME localuser@localhost
+
+...

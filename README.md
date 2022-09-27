@@ -26,14 +26,14 @@ Check the variables, create your inventory and playbook - and run it.
 
 Install `ansible` for your distribution (probably archlinux).
 
-_group_vars/install.yml_
+_group_vars/*.yml_
 You should be able to understand what's there.
 Necessary changes:
 - timezone
-- user (incl. everything in there except useraddParams, which is fine that way)
+- user (incl. everything in there except addParams, which is fine that way)
 
-_host\_vars/template.yml_
-- copy that file to MyHostname.yml within the same directory
+_host_vars/*.yml_
+- copy the files to MyHostname.yml within the same directory
 - check any line if you need changes to it.
 - necessary changes are:
   - hostname
@@ -51,7 +51,7 @@ Open an issue if something is not working like you expected.
 
 What now?
 
-Create a _inventory.ini_ with content like:
+Create an _inventory.ini_ with content like:
 ```
 MyHostname	ansible_host=localhost ansible_port=5555 ansible_user=root
 
@@ -60,7 +60,7 @@ MyHostname
 ```
 source: https://docs.ansible.com/ansible/latest/network/getting_started/first_inventory.html
 
-This file contains any host which ansible will able to talk with.
+This file contains any host which ansible will be able to talk with.
 The \[install\] is a group definition - with this the _group\_vars/install.yml_ will be included in each playbook run.
 
 Now create your playbook _install.yml_ like:
@@ -78,12 +78,12 @@ Now create your playbook _install.yml_ like:
 ```
 source: https://docs.ansible.com/ansible/latest/network/getting_started/first_playbook.html#create-and-run-your-first-network-ansible-playbook
 
-The _---_ and _..._ are not necessary but they mark a yaml file.
+The _---_ and _..._ are not necessary, but they mark a yaml file.
 It should be pretty straight forward until now.
 
 You have the inventory and the playbook ready - and created your own host_vars/MyHostname.yml file - then you can run the playbook:
 ```bash
-ansible-playbook -i inventory.ini install.yml
+ansible-playbook -i inventory.ini default.yml install.yml user.yml
 ```
 
 That's it for the ansible howto.

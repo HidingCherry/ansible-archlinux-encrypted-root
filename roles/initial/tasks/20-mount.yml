@@ -2,81 +2,81 @@
 
 - debug:
     msg: "WARNING: opening cryptdevice with --allow-discards!"
-  when: allowDiscards
+  when: partitions.allowDiscards
 
 - block:
   - name: filesystem -> check for cryptdevice
     stat:
-      path: '{{ rootDevice }}'
+      path: '/dev/mapper/{{ storage.partitions.root.label.mapper }}'
     register: cryptdevice
   - name: filesystem -> open root cryptdevice
     shell:
       bash -c "echo '{{ cryptsetup.password }}' |
       cryptsetup
-      {% if allowDiscards %}--allow-discards{% endif %}
+      {% if partitions.allowDiscards %}--allow-discards{% endif %}
       luksOpen
-      /dev/disk/by-partlabel/{{ part_infos.partitions[1].partlabel }}
-      {{ part_infos.partitions[1].mapperLabel }}"
+      /dev/disk/by-partlabel/{{ storage.partitions.root.encrypted.label }}
+      {{ storage.partitions.root.label.mapper }}"
     when: not cryptdevice.stat.exists
 
 - name: mount -> btrfs -> rootfs subvolume
   ansible.posix.mount:
-    src: "LABEL={{ part_infos.partitions[1].fslabel }}"
-    opts: "{{ part_infos.partitions[1].rootfs.opts }}"
-    path: "{{ part_infos.mountPath }}{{ part_infos.partitions[1].rootfs.path }}"
+    src: "LABEL={{ storage.partitions.root.decrypted.label }}"
+    opts: "{{ storage.partitions.root.decrypted.opts }}{{ storage.partitions.root.decrypted.path }}"
+    path: "{{ storage.mountPath }}{{ storage.partitions.root.decrypted.path }}"
     state: mounted
-    fstype: "{{ part_infos.partitions[1].fstype }}"
+    fstype: "{{ storage.partitions.root.decrypted.type }}"
 
 - block:
   - name: create -> folder for boot
     file:
-      path: "{{ part_infos.mountPath }}{{ part_infos.partitions[0].bootfs.path }}"
+      path: "{{ storage.mountPath }}{{ storage.partitions.boot.decrypted.path }}"
       state: directory
       mode: '0000'
   - name: mount -> boot
     mount:
-      src: "LABEL={{ part_infos.partitions[0].fslabel }}"
-      opts: "{{ part_infos.partitions[0].bootfs.opts }}"
-      path: "{{ part_infos.mountPath }}{{ part_infos.partitions[0].bootfs.path }}"
+      src: "LABEL={{ storage.partitions.boot.decrypted.label }}"
+      opts: "{{ storage.partitions.boot.decrypted.opts }}"
+      path: "{{ storage.mountPath }}{{ storage.partitions.boot.decrypted.path }}"
       state: mounted
-      fstype: "{{ part_infos.partitions[0].fstype }}"
+      fstype: "{{ storage.partitions.boot.decrypted.type }}"
 
 - block:
   - name: create -> folder for efi
     file:
-      path: "{{ part_infos.mountPath }}{{ part_infos.uefi.EFIfs.path }}"
+      path: "{{ storage.mountPath }}{{ firmware.uefi.EFIfs.path }}"
       state: directory
       mode: '0000'
   - name: mount -> efi
     mount:
-      src: "LABEL={{ part_infos.uefi.fslabel }}"
-      opts: "{{ part_infos.uefi.EFIfs.opts }}"
-      path: "{{ part_infos.mountPath }}{{ part_infos.uefi.EFIfs.path }}"
+      src: "LABEL={{ firmware.uefi.fs.label }}"
+      opts: "{{ firmware.uefi.EFIfs.opts }}"
+      path: "{{ storage.mountPath }}{{ firmware.uefi.EFIfs.path }}"
       state: mounted
-      fstype: "{{ part_infos.uefi.fstype }}"
+      fstype: "{{ firmware.uefi.fs.type }}"
   when: efiFirmware.stat.exists
 
 - name: create -> folders for mounts
   file:
-    path: "{{ part_infos.mountPath }}{{ item.path }}"
+    path: "{{ storage.mountPath }}{{ item.path }}"
     state: directory
     mode: '0000'
-  with_items: "{{ part_infos.partitions[1].subvolumes }}"
-  when: part_infos.partitions[1].subvolumes is defined
+  with_items: "{{ storage.partitions.root.decrypted.subvolumes }}"
+  when: storage.partitions.root.decrypted.subvolumes is defined
 
 - name: mount -> btrfs -> subvolumes
   mount:
-    src: "LABEL={{ part_infos.partitions[1].fslabel }}"
-    opts: "{{ item.opts }}"
-    path: "{{ part_infos.mountPath }}{{ item.path }}"
+    src: "LABEL={{ storage.partitions.root.decrypted.label }}"
+    opts: "{{ item.opts }}{{ item.path }}"
+    path: "{{ storage.mountPath }}{{ item.path }}"
     state: mounted
-    fstype: "{{ part_infos.partitions[1].fstype }}"
-  with_items: "{{ part_infos.partitions[1].subvolumes }}"
-  when: part_infos.partitions[1].subvolumes is defined
+    fstype: "{{ storage.partitions.root.decrypted.type }}"
+  with_items: "{{ storage.partitions.root.decrypted.subvolumes }}"
+  when: storage.partitions.root.decrypted.subvolumes is defined
 
 - name: permission -> correct /var permission
   file:
-    path: "{{ part_infos.mountPath }}/var"
+    path: "{{ storage.mountPath }}/var"
     state: directory
     mode: '0755'
 

@@ -2,22 +2,22 @@
 
 - name: edit locale.gen
   lineinfile:
-    path: "{{ part_infos.mountPath }}/etc/locale.gen"
+    path: "{{ storage.mountPath }}/etc/locale.gen"
     regexp: '^#(en_US\.UTF-8 UTF-8)'
     line: '\g<1>'
     backrefs: yes
 
 - name: execute locale-gen
-  shell: "arch-chroot {{ part_infos.mountPath }} locale-gen"
+  shell: "arch-chroot {{ storage.mountPath }} locale-gen"
 
 - name: create locale.conf
   copy:
-    dest: "{{ part_infos.mountPath }}/etc/locale.conf"
+    dest: "{{ storage.mountPath }}/etc/locale.conf"
     content: "LANG=en_US.UTF-8"
 
 - name: create vconsole.conf
   copy:
-    dest: "{{ part_infos.mountPath }}/etc/vconsole.conf"
+    dest: "{{ storage.mountPath }}/etc/vconsole.conf"
     content: "KEYMAP=us"
 
 ...

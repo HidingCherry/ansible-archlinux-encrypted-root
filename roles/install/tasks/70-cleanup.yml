@@ -1,10 +1,10 @@
 ---
 
 - name: delete package cache
-  shell: 'arch-chroot {{ part_infos.mountPath }} pacman -Scc --noconfirm'
+  shell: 'arch-chroot {{ storage.mountPath }} pacman -Scc --noconfirm'
 
 - name: remount with discard
-  shell: 'mount -o remount,discard {{ part_infos.mountPath }}'
+  shell: 'mount -o remount,discard {{ storage.mountPath }}'
 
 - name: perform fstrim
   shell: 'fstrim -a'

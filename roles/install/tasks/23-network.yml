@@ -2,29 +2,29 @@
 
 - name: set hostname
   copy:
-    dest: "{{ part_infos.mountPath }}/etc/hostname"
-    content: "{{ hostname }}"
+    dest: "{{ storage.mountPath }}/etc/hostname"
+    content: "{{ network.hostname }}"
 
 - name: set hosts
   copy:
-    dest: "{{ part_infos.mountPath }}/etc/hosts"
+    dest: "{{ storage.mountPath }}/etc/hosts"
     content: |
       127.0.0.1   localhost
       ::1         localhost
-      127.0.1.1   {{ hostname }}.{{ localdomain }} {{ hostname }}
+      127.0.1.1   {{ network.hostname }}.{{ network.localdomain }} {{ network.hostname }}
 
 - name: create {{ item.key }}.network file
   copy:
-    dest: "{{ part_infos.mountPath }}/etc/systemd/network/{{ item.key }}.network"
+    dest: "{{ storage.mountPath }}/etc/systemd/network/{{ item.key }}.network"
     content: "{{ systemdNetworkd.network[item.key] }}"
   with_dict: "{{ systemdNetworkd.interfaces }}"
 
 - name: create initrd-network
   copy:
-    dest: "{{ part_infos.mountPath }}/etc/mkinitcpio-systemd-tool/network/initrd-network.network"
+    dest: "{{ storage.mountPath }}/etc/mkinitcpio-systemd-tool/network/initrd-network.network"
     content: "{{ network.initrd }}"
 
 - name: enable systemd-networkd
-  shell: "arch-chroot {{ part_infos.mountPath }} systemctl enable systemd-networkd"
+  shell: "arch-chroot {{ storage.mountPath }} systemctl enable systemd-networkd"
 
 ...

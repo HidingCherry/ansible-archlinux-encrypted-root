@@ -4,12 +4,12 @@
   shell: '/usr/bin/pacman -Sy --noconfirm archlinux-keyring'
 
 - name: execute pacstrap
-  shell: '/usr/bin/pacstrap {{ part_infos.mountPath }} {{ install.pacstrap }}'
+  shell: '/usr/bin/pacstrap {{ storage.mountPath }} {{ install.pacstrap }}'
 
 - name: execute partprobe
-  shell: '/usr/bin/partprobe /dev/mapper/{{ part_infos.partitions[1].mapperLabel }}'
+  shell: '/usr/bin/partprobe /dev/mapper/{{ storage.partitions.root.label.mapper }}'
 
 - name: execute genfstab
-  shell: '/usr/bin/genfstab -U {{ part_infos.mountPath }} >> {{ part_infos.mountPath }}/etc/fstab'
+  shell: '/usr/bin/genfstab -U {{ storage.mountPath }} >> {{ storage.mountPath }}/etc/fstab'
 
 ...

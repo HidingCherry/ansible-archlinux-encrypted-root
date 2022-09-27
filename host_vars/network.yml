@@ -1,0 +1,33 @@
+---
+
+network:
+  hostname: "archlinux"
+  initrd: |
+    [Match]
+    Name=eth0
+
+    [Network]
+    Address=IPV4/SUBNET
+    Gateway=GWIPV4
+  localdomain: "lan"
+  systemdNetworkd:
+    interfaces:
+      eno1: "eno1 eth0"
+    network:
+      eno1: |
+        [Match]
+        Name=INTERFACE-NAMES
+  
+        [Network]
+        Address=IPV4/SUBNET
+        Gateway=GWIPV4
+  
+        #DHCP=ipv6
+        Address=IPV6/SUBNET
+        #IPv6AcceptRA=true
+  
+        #[DHCPv6]
+        #DUIDType=link-layer
+        #DUIDRawData=SOMEDUID
+
+...

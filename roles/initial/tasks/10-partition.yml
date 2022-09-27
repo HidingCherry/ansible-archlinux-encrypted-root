@@ -3,57 +3,57 @@
 - name: umount mountPath
   shell:
     umount -R
-    {{ part_infos.mountPath }} || true
+    {{ storage.mountPath }} || true
 
 - block:
   - name: check for cryptdevice
     stat:
-      path: '{{ rootDevice }}'
+      path: '/dev/mapper/{{ storage.partitions.root.label.mapper }}'
     register: cryptdevice
   - name: close cryptdevice
     shell:
       cryptsetup
       luksClose
-      {{ part_infos.partitions[1].mapperLabel }}
+      {{ storage.partitions.root.label.mapper }}
     when: cryptdevice.stat.exists
 
 - name: Remove all partitions from disk
   shell: sgdisk
     --zap-all
-    /dev/{{ part_infos.device }}
+    /dev/{{ storage.device }}
 
 - name: create biosBoot partition
   shell: sgdisk
-    --set-alignment={{ item.alignment }}
-    --new={{ item.number }}:{{ item.part_start }}:{{ item.part_end }}
-    --change-name=0:"{{ item.partlabel }}"
+    --set-alignment={{ item.layout.alignment }}
+    --new={{ item.number }}:{{ item.layout.start }}:{{ item.layout.end }}
+    --change-name=0:"{{ item.layout.label }}"
     --typecode=0:{{ item.type }}
-    /dev/{{ part_infos.device }}
+    /dev/{{ storage.device }}
   with_items:
-    - "{{ part_infos.bios }}"
+    - "{{ firmware.bios }}"
   when: not efiFirmware.stat.exists
 
 - name: create EFI partition
   shell: sgdisk
-    --set-alignment={{ item.alignment }}
-    --new={{ item.number }}:{{ item.part_start }}:{{ item.part_end }}
-    --change-name=0:"{{ item.partlabel }}"
+    --set-alignment={{ item.layout.alignment }}
+    --new={{ item.number }}:{{ item.layout.start }}:{{ item.layout.end }}
+    --change-name=0:"{{ item.layout.label }}"
     --typecode=0:{{ item.type }}
-    /dev/{{ part_infos.device }}
+    /dev/{{ storage.device }}
   with_items:
-    - "{{ part_infos.uefi }}"
+    - "{{ firmware.uefi }}"
   when: efiFirmware.stat.exists
 
 - name: create partitions
   shell: sgdisk
-    --set-alignment={{ item.alignment }}
-    --new={{ item.number }}:{{ item.part_start }}:{{ item.part_end }}
-    --change-name=0:"{{ item.partlabel }}"
-    --typecode=0:{{ item.type }}
-    /dev/{{ part_infos.device }}
+    --set-alignment={{ item.encrypted.sector.alignment }}
+    --new={{ item.number }}:{{ item.encrypted.sector.start }}:{{ item.encrypted.sector.end }}
+    --change-name=0:"{{ item.encrypted.label }}"
+    --typecode=0:{{ item.encrypted.type }}
+    /dev/{{ storage.device }}
   with_items:
-    - "{{ part_infos.partitions[0] }}"
-    - "{{ part_infos.partitions[1] }}"
+    - "{{ storage.partitions.boot }}"
+    - "{{ storage.partitions.root }}"
 
 
 - include_tasks: 11-encrypted-rootfs.yml

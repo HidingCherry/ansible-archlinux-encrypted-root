@@ -1,43 +1,29 @@
 ---
 
 install:
-  installCmd: 'pacman -S --noconfirm'
+  cmd: 'pacman -S --noconfirm'
   pacstrap: >
     base
-    linux-hardened
-    linux-firmware
     bind
     btrfs-progs
     cryptsetup
     inetutils
+    linux-firmware
+    linux-hardened
+    mkinitcpio-systemd-tool
     moreutils
     nano
     openssh
     sudo
-    mkinitcpio-systemd-tool
     tinyssh
     tinyssh-convert
-# bind for dig, host, nslookup
-# linux-hardened-headers - bloat for kvm image
-# linux-firmware - bloat for kvm image, needed?
-### START encrypted system
-# mkinitcpio-systemd-tool
-# tinyssh
-# tinyssh-convert
-### END   encrypted system
-
-  timezone: "Europe/Berlin"
-
-localdomain: "lan"
-
-bootloader:
-  timeout: "0"
-
-user:
-  - name: user999
-    useraddParams: "--groups wheel --create-home --shell /bin/bash --user-group"
-    sshKeys: |
-      ssh-ed25519 CHANGEME localuser@localhost
-    password: 'example'
+  # bind for dig, host, nslookup
+  # linux-hardened-headers - bloat for kvm image
+  # linux-firmware - bloat for kvm image, needed?
+  ### START encrypted system
+  # mkinitcpio-systemd-tool
+  # tinyssh
+  # tinyssh-convert
+  ### END   encrypted system
 
 ...

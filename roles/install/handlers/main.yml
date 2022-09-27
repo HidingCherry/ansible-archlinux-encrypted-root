@@ -1,12 +1,12 @@
 ---
 
 - name: run mkinitcpio
-  shell: arch-chroot {{ part_infos.mountPath }} mkinitcpio -P
+  shell: arch-chroot {{ storage.mountPath }} mkinitcpio -P
   listen: regenerate initramfs
   ignore_errors: yes
 
 - name: run grub-mkconfig
-  shell: arch-chroot {{ part_infos.mountPath }} grub-mkconfig -o /boot/grub/grub.cfg
+  shell: arch-chroot {{ storage.mountPath }} grub-mkconfig -o /boot/grub/grub.cfg
   listen: regenerate grub.cfg
 
 ...
