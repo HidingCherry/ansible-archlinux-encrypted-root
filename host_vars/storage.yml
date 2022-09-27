@@ -8,11 +8,11 @@ storage:
   partitions:
     boot:
       decrypted:
-        createOpt: "-F -L bootfs"
+        createOpt: "-f -L bootfs --csum xxhash"
         label: "bootfs"
         opts: "lazytime" # , umask=0077" ### umask only with vfat
         path: "/boot"
-        type: "ext4"
+        type: "btrfs"
       encrypted:
         alignment: "2048"
         end: "+256M"
