@@ -7,7 +7,7 @@ Always the same tutorial but different ways and no one to help out.
 
 This script does nearly the same as any tutorial - with some predefined things.
 
-- root: btrfs with several subvolumes to keep your system clean
+- root: btrfs with several sub-volumes to keep your system clean
 - boot: could be anything supported by grub - only ext4 tested
 - bootloader: grub
 - initrd-ssh: tinyssh with a login via ssh-key
@@ -114,8 +114,8 @@ qemu-system-x86_64 \
 
 I use this commandline to start the VM - BIOS mode, not EFI.
 
-For EFI you need a bios-file - then add something like that as a parameter `-bios uefi.nosecureboot.bin`.
-You would need to use the archwiki for that file - although I'm sure there is some ready-to-go file shipped with qemu.
+For EFI, you need a bios-file - then add something like that as a parameter `-bios uefi.nosecureboot.bin`.
+You would need to use the arch-wiki for that file - although I'm sure there is some ready-to-go file shipped with qemu.
 
 Be sure to change `-smp` (cores) and `-m` (memory in MB) according to your needs (especially for the encryption/decryption for cryptsetup they are important since argon2id is default).
 
@@ -130,7 +130,7 @@ tar -cjO arch-vm.img | ssh MyHostname bash -c 'cat | tar -xjOf - | sudo dd of=/d
 
 This works if your System is running on a recovery OS or from some USB stick. I am pretty sure you have at least one of them.
 
-If you have neither - then you'ld need to do some magic and put the image into a loop-device and write the partitions from there to the disk - don't forget to run a grub-install while your new boot-partition is mounted on _/boot_.
+If you have neither - then you'll need to do some magic and put the image into a loop-device and write the partitions from there to the disk - don't forget to run a grub-install while your new boot-partition is mounted on _/boot_.
 (I am not giving further support for writing the image on a live-running system - you should already know what you're doing at this point.)
 
 That's basically it - with the VM image thing, it's also pretty straight forward.
