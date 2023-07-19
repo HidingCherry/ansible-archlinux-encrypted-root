@@ -27,4 +27,8 @@
 - name: enable systemd-networkd
   shell: "arch-chroot {{ part_infos.mountPath }} systemctl enable systemd-networkd"
 
+### we need to create the symlink outside arch-chroot - because arch-chroot itself mount-bind(?) the file
+- name: link resolv.conf to stub-resolv.conf from systemd-networkd
+  shell: "ln -rsf /run/systemd/resolve/stub-resolv.conf {{ part_infos.mountPath }}/etc/resolv.conf"
+
 ...
