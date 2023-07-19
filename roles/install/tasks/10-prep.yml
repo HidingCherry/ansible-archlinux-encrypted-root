@@ -4,7 +4,7 @@
   shell: '/usr/bin/pacman -Sy --noconfirm archlinux-keyring'
 
 - name: execute pacstrap
-  shell: '/usr/bin/pacstrap {{ part_infos.mountPath }} {{ install.pacstrap }}'
+  shell: '/usr/bin/pacstrap -c {{ part_infos.mountPath }} {{ install.pacstrap }}'
 
 - name: execute partprobe
   shell: '/usr/bin/partprobe /dev/mapper/{{ part_infos.partitions[1].mapperLabel }}'
