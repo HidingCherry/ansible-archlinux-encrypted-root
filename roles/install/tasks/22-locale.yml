@@ -4,7 +4,7 @@
   lineinfile:
     path: "{{ part_infos.mountPath }}/etc/locale.gen"
     regexp: '^#(en_US\.UTF-8 UTF-8)'
-    line: '\g<1>'
+    line: '\1'
     backrefs: yes
 
 - name: execute locale-gen
