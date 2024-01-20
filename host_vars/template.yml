@@ -39,7 +39,7 @@ part_infos:
     part_start: "0"
     part_end: "128M"
     number: 10
-    type: "bc13c2ff-59e6-4262-a352-b275fd6f7172"
+    type: "C12A7328-F81F-11D2-BA4B-00A0C93EC93B"
 
     fstype: "vfat"
     fslabel: "EFIfs"
