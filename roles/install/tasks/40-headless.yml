@@ -57,8 +57,8 @@
 
 - name: get cryptroot UUID
   shell: blkid -o export /dev/mapper/{{ part_infos.partitions[1].mapperLabel }} |
-    grep -e "^UUID=" |
-    cut -d= -f 2
+    grep -E "^UUID=" |
+    cut -d'=' -f2
   register: cryptrootUUID
 
 - name: get cryptroot fstab entry
