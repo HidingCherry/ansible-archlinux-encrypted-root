@@ -10,12 +10,17 @@
     dest: "{{ part_infos.mountPath }}/etc/securetty"
     content: ''
 
+- name: get all linux kernels
+  shell: 'arch-chroot {{ part_infos.mountPath }} find /boot/ -maxdepth 1 -name vmlinuz* | xargs basename'
+  register: vmlinuz
+
 - name: remove fallback initrd in preset
   replace:
     backup: yes
-    path: "{{ part_infos.mountPath }}/etc/mkinitcpio.d/linux-hardened.preset"
+    path: "{{ part_infos.mountPath }}/etc/mkinitcpio.d/{{ item }}.preset"
     regexp: '^(PRESETS=\()(''default'')( ''fallback'')?(.*\))$'
     replace: '\g<1>\g<2>\g<4>'
+  with_items: "{{ (vmlinuz.stdout | split('\n')) }}"
   notify: regenerate initramfs
 
 - name: delete fallback initrd
