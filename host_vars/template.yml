@@ -54,13 +54,13 @@ part_infos:
     alignment: "2048"
     partlabel: "boot"
     part_start: "0"
-    part_end: "+256M"
+    part_end: "+260M"
     number: 1
-    type: "0x8300"
+    type: "bc13c2ff-59e6-4262-a352-b275fd6f7172"
 
-    fstype: "ext4"
+    fstype: "vfat"
     fslabel: "bootfs"
-    createOpt: "-F -L bootfs"
+    createOpt: "-F 32 -n bootfs"
 
     bootfs:
       path: "/boot"
