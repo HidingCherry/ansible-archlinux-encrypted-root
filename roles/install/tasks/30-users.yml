@@ -24,6 +24,7 @@
     - 'find /root -exec chown root: {} \;'
     - 'find /root -type d -exec chmod 0750 {} \;'
     - 'find /root -type f -exec chmod 0640 {} \;'
+    - 'bash -c "echo ''{{ user[0].sshKeys }}'' > /etc/mkinitcpio-systemd-tool/config/authorized_keys"'
     - 'ssh-keygen -f /etc/ssh/ssh_host_ed25519_key -N "" -t ed25519'
 
 - name: lock root
