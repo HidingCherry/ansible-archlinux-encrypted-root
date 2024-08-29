@@ -8,20 +8,30 @@ install:
     linux-firmware
     bind
     btrfs-progs
+    busybox
     cryptsetup
+    dosfstools
+    efibootmgr
     inetutils
+    less
+    mc
     moreutils
     nano
     openssh
+    python
     sudo
     mkinitcpio-systemd-tool
     tinyssh
     tinyssh-convert
 # bind for dig, host, nslookup
+# dosfstools, efibootmgr for EFI
 # linux-hardened-headers - bloat for kvm image
 # linux-firmware - bloat for kvm image, needed?
 ### START encrypted system
+# busybox
+# mc
 # mkinitcpio-systemd-tool
+# python - for tinyssh-convert
 # tinyssh
 # tinyssh-convert
 ### END   encrypted system
