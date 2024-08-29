@@ -9,5 +9,9 @@
   register: efiFirmware
 
 - include_tasks: 62-grub.yml
+  when: not efiFirmware.stat.exists
+
+- include_tasks: 63-systemd-boot.yml
+  when: efiFirmware.stat.exists
 
 ...

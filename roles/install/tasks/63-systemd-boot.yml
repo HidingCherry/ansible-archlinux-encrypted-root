@@ -1,0 +1,46 @@
+---
+
+- name: install systemd-boot to ESP
+  shell: 'arch-chroot {{ part_infos.mountPath }} bootctl --esp-path=/efi --boot-path=/boot install'
+
+- name: create entries folder
+  file:
+    path: "{{ part_infos.mountPath }}/loader/entries"
+    state: directory
+    recurse: yes
+
+- name: get cryptroot UUID
+  shell: blkid -o export /dev/mapper/{{ part_infos.partitions[1].mapperLabel }} |
+    grep -e "^UUID=" |
+    cut -d= -f 2
+  register: cryptrootUUID
+
+- name: get ucode initrd
+  shell: 'arch-chroot {{ part_infos.mountPath }} find /boot/ -maxdepth 1 | grep ucode | sed ''s|/boot/||'''
+  register: ucode
+
+- name: get all linux kernels
+  shell: 'arch-chroot {{ part_infos.mountPath }} find /boot/ -maxdepth 1 | grep vmlinuz | sed ''s|/boot/vmlinuz-||'''
+  register: vmlinuz
+
+- name: create arch boot entry
+  copy:
+    dest: "{{ part_infos.mountPath }}/boot/loader/entries/arch-{{ item }}.conf"
+    content: |
+      title   Arch Linux - {{ item }}
+      linux   /vmlinuz-{{ item }}
+      {% for ucodeImg in (ucode.stdout | split('\n')) %}
+      initrd  /{{ ucodeImg }}
+      {% endfor %}
+      initrd  /initramfs-{{ item }}.img
+      options root=UUID={{ cryptrootUUID.stdout }} rw rootflags={{ part_infos.partitions[1].rootfs.opts }} quiet
+  with_items: "{{ (vmlinuz.stdout | split('\n')) }}"
+
+- name: replace bootmenu-timeout
+  copy:
+    dest: "{{ part_infos.mountPath }}/boot/loader/loader.conf"
+    content: |
+      default arch-{{ (vmlinuz.stdout | split('\n'))[0] }}.conf
+      timeout 0
+
+...
