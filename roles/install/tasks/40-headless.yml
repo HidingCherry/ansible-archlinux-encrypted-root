@@ -38,10 +38,14 @@
     replace: '\g<1>systemd systemd-tool \g<3>'
   notify: regenerate initramfs
 
+- name: resolve device-path
+  shell: "readlink -f {{ part_infos.device }}"
+  register: blockdevice_root
+
 - name: get root UUID
-  shell: blkid -o export /dev/{{ part_infos.device }}{{ part_infos.partitions[1].number }} |
-    grep -e "^UUID=" |
-    cut -d= -f 2
+  shell: blkid -o export {{ blockdevice_root.stdout }}{{ part_infos.partitions[1].number }} |
+    grep -E "^UUID=" |
+    cut -d'=' -f2
   register: rootUUID
 
 - name: setup systemd-crypttab
