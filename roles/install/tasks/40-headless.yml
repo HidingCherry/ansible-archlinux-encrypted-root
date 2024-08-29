@@ -34,7 +34,7 @@
     after: 'HOOKS='
     before: '# COMPRESSION'
     path: "{{ part_infos.mountPath }}/etc/mkinitcpio.conf"
-    regexp: '^(HOOKS=\([ \-a-z]*filesystems )(systemd systemd-tool)?([ \-a-z]*\))$'
+    regexp: '^(HOOKS=\([ \-a-z]*filesystems )(systemd systemd-tool)? ?([ \-a-z]*\))$'
     replace: '\g<1>systemd systemd-tool \g<3>'
   notify: regenerate initramfs
 
