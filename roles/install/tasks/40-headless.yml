@@ -27,7 +27,6 @@
   file:
     path: "{{ part_infos.mountPath }}/boot/initramfs-linux-hardened-fallback.img"
     state: absent
-  notify: regenerate grub.cfg
 
 - name: insert 'systemd systemd-tool' into mkinitcpio.conf
   replace:
