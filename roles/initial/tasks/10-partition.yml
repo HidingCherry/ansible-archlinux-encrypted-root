@@ -20,7 +20,7 @@
 - name: Remove all partitions from disk
   shell: sgdisk
     --zap-all
-    /dev/{{ part_infos.device }}
+    {{ blockdevice_root.stdout }}
 
 - name: create biosBoot partition
   shell: sgdisk
@@ -28,7 +28,7 @@
     --new={{ item.number }}:{{ item.part_start }}:{{ item.part_end }}
     --change-name=0:"{{ item.partlabel }}"
     --typecode=0:{{ item.type }}
-    /dev/{{ part_infos.device }}
+    {{ blockdevice_root.stdout }}
   with_items:
     - "{{ part_infos.bios }}"
   when: not efiFirmware.stat.exists
@@ -39,7 +39,7 @@
     --new={{ item.number }}:{{ item.part_start }}:{{ item.part_end }}
     --change-name=0:"{{ item.partlabel }}"
     --typecode=0:{{ item.type }}
-    /dev/{{ part_infos.device }}
+    {{ blockdevice_root.stdout }}
   with_items:
     - "{{ part_infos.uefi }}"
   when: efiFirmware.stat.exists
@@ -50,7 +50,7 @@
     --new={{ item.number }}:{{ item.part_start }}:{{ item.part_end }}
     --change-name=0:"{{ item.partlabel }}"
     --typecode=0:{{ item.type }}
-    /dev/{{ part_infos.device }}
+    {{ blockdevice_root.stdout }}
   with_items:
     - "{{ part_infos.partitions[0] }}"
     - "{{ part_infos.partitions[1] }}"

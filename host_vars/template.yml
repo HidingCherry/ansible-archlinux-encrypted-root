@@ -22,7 +22,7 @@ cryptsetup:
 part_infos:
   mountPath: "/mnt"
   partitionTable: "gpt"
-  device: "sda"
+  device: "/dev/disk/by-path/your_device"
   encrypted: true
 
   bios:

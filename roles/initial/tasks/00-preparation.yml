@@ -1,5 +1,9 @@
 ---
 
+- name: resolve device-path
+  shell: "readlink -f {{ part_infos.device }}"
+  register: blockdevice_root
+
 - name: Update the system clock
   command: "timedatectl set-ntp true"
 
