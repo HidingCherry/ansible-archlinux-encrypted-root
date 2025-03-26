@@ -25,6 +25,8 @@
     {% if cryptsetup.iterTime is defined %}--iter-time={{ cryptsetup.iterTime }}
     {% elif cryptsetup.pbkdfForceIterations %}--pbkdf-force-iterations={{ cryptsetup.pbkdfForceIterations }}
     {% endif %}
+    --pbkdf-memory={{ cryptsetup.pbkdfMemory }}
+    --pbkdf-parallel={{ cryptsetup.pbkdfParallel }}
     --label={{ part_infos.partitions[1].cryptLabel }}
     /dev/disk/by-partlabel/{{ part_infos.partitions[1].partlabel }}"
 
