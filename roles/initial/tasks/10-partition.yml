@@ -55,6 +55,9 @@
     - "{{ part_infos.partitions[0] }}"
     - "{{ part_infos.partitions[1] }}"
 
+### TODO install parted for partprobe
+- name: inform kernel of new partitions
+  shell: partprobe {{ blockdevice_root.stdout }}
 
 - include_tasks: 11-encrypted-rootfs.yml
 - include_tasks: 15-filesystem.yml
