@@ -27,7 +27,7 @@
   notify: regenerate grub.cfg
 
 - name: execute grub-install
-  shell: arch-chroot {{ part_infos.mountPath }} grub-install --target=i386-pc /dev/{{ part_infos.device }}
+  shell: arch-chroot {{ part_infos.mountPath }} grub-install --target=i386-pc {{ part_infos.device }}
   notify: regenerate grub.cfg
 
 ...
