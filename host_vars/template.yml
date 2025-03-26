@@ -31,7 +31,7 @@ part_infos:
     part_start: "34"
     part_end: "2047"
     number: 10
-    type: "0xEA00"
+    type: "0xEF02"
 
   uefi:
     alignment: "2048"
