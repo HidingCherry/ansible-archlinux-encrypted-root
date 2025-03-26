@@ -3,7 +3,7 @@
 - name: filesystem -> format EFIfs
   filesystem:
     force: yes
-    dev: "{{ blockdevice_root.stdout }}{{ part_infos.uefi.number }}"
+    dev: "{{ blockdevice_root.stdout }}{{ 'p' if (blockdevice_root.stdout | regex_search('nvme')) else '' }}{{ part_infos.uefi.number }}"
     fstype: "{{ part_infos.uefi.fstype }}"
     opts: "{{ part_infos.uefi.createOpt }}"
   when: efiFirmware.stat.exists
@@ -11,7 +11,7 @@
 - name: filesystem -> format bootfs
   filesystem:
     force: yes
-    dev: "{{ blockdevice_root.stdout }}{{ part_infos.partitions[0].number }}"
+    dev: "{{ blockdevice_root.stdout }}{{ 'p' if (blockdevice_root.stdout | regex_search('nvme')) else '' }}{{ part_infos.partitions[0].number }}"
     fstype: "{{ part_infos.partitions[0].fstype }}"
     opts: "{{ part_infos.partitions[0].createOpt }}"
 
