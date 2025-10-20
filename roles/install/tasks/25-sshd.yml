@@ -10,4 +10,10 @@
       [Service]
       Nice={{ systemd.sshd.nice | default('-5') }}
 
+- name: added nice value for sftp-server (beware of sshd nice value)
+  community.general.ssh_config:
+    ssh_config_file: "{{ part_infos.mountPath }}/etc/ssh/sshd_config"
+    other_options:
+      subsystem: "sftp    /sbin/nice -n{{ systemd.sshd.sftp_nice | default('6') }} {{ systemd.sshd.sftp_command | default('/usr/lib/ssh/sftp-server')"
+
 ...
