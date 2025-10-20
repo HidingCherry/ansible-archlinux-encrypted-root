@@ -3,4 +3,11 @@
 - name: enable sshd
   shell: 'arch-chroot {{ part_infos.mountPath }} systemctl enable sshd'
 
+- name: nice sshd
+  copy:
+    dest: {{ part_infos.mountPath }}/etc/systemd/system/sshd.service.d/override.conf
+    content: |
+      [Service]
+      Nice={{ systemd.sshd.nice | default('-5') }}
+
 ...
